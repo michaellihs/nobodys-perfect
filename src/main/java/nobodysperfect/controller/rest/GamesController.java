@@ -8,10 +8,7 @@ import nobodysperfect.domain.Game;
 import nobodysperfect.exception.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -41,12 +38,26 @@ public class GamesController extends RestController {
         return game;
     }
 
+
+    /**
+     * In order to make this method call work with Postman, use the following "parameter":
+     *
+     * URL:                http://localhost:8080/api/games
+     * Headers:            Content-Type application/json
+     * raw post content:   {
+     *                       "title" : "title",
+     *                       "description" : "description"
+     *                     }
+     */
     @ApiOperation(value = "addGame", nickname = "addGame")
     @ApiResponses(value = {
             @ApiResponse(code = 302, message = "Redirect"),
             @ApiResponse(code = 500, message = "Failure")})
-    @RequestMapping(value = "/games", method = RequestMethod.POST)
-    public void addGame(Game game, HttpServletResponse response) throws IOException {
+    @RequestMapping(
+            value = "/games",
+            method = RequestMethod.POST,
+            consumes = "application/json")
+    public void addGame(@RequestBody Game game, HttpServletResponse response) throws IOException {
         gameRepository.save(game);
         response.sendRedirect("/api/games/" + game.getId());
     }
