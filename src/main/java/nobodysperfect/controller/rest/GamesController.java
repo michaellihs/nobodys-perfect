@@ -6,12 +6,15 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import nobodysperfect.domain.Game;
 import nobodysperfect.exception.EntityNotFoundException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 @org.springframework.web.bind.annotation.RestController
@@ -57,9 +60,16 @@ public class GamesController extends RestController {
             value = "/games",
             method = RequestMethod.POST,
             consumes = "application/json")
-    public void addGame(@RequestBody Game game, HttpServletResponse response) throws IOException {
+    public void addGame(@RequestBody Game game, UriComponentsBuilder uriComponentsBuilder, HttpServletResponse response) throws IOException {
         gameRepository.save(game);
-        response.sendRedirect("/api/games/" + game.getId());
+
+        HttpHeaders headers = new HttpHeaders();
+        URI locationUri = uriComponentsBuilder.path("/api/games/")
+                                              .path(String.valueOf(game.getId()))
+                                              .build()
+                                              .toUri();
+
+        response.sendRedirect(locationUri.toString());
     }
 
     @RequestMapping(value = "/games/{game}", method = RequestMethod.DELETE)
