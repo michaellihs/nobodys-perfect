@@ -60,7 +60,7 @@ public class GamesController extends RestController {
             value = "/games",
             method = RequestMethod.POST,
             consumes = "application/json")
-    public void addGame(@RequestBody Game game, UriComponentsBuilder uriComponentsBuilder, HttpServletResponse response) throws IOException {
+    public ResponseEntity<Game> addGame(@RequestBody Game game, UriComponentsBuilder uriComponentsBuilder, HttpServletResponse response) throws IOException {
         gameRepository.save(game);
 
         HttpHeaders headers = new HttpHeaders();
@@ -69,7 +69,9 @@ public class GamesController extends RestController {
                                               .build()
                                               .toUri();
 
-        response.sendRedirect(locationUri.toString());
+        headers.setLocation(locationUri);
+
+        return new ResponseEntity<>(game, headers, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/games/{game}", method = RequestMethod.DELETE)
